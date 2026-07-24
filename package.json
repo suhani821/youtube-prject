@@ -1,0 +1,30 @@
+{
+  "name": "youtube-prject",
+  "version": "1.0.0",
+  "description": "youtube project",
+  "homepage": "https://github.com/suhani821/youtube-prject#readme",
+  "bugs": {
+    "url": "https://github.com/suhani821/youtube-prject/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suhani821/youtube-prject.git"
+  },
+  "license": "ISC",
+  "author": "suhani singhal",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -r dotenv/config src/index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.5"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "mongoose": "^9.7.4"
+  }
+}
