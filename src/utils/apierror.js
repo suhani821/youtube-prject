@@ -8,8 +8,8 @@ class ApiError extends Error {
         this.data = null;
         this.errors = errors;
 
-        if (errstack) {
-            this.stack = errstack;
+        if (stack) {
+            this.stack = stack;
         } else if (Error.captureStackTrace) {
             Error.captureStackTrace(this, this.constructor);
         }
