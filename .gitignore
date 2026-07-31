@@ -70,7 +70,7 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+//we should be adding .env in this to not push in git but right now i am doing it for project only....
 .env.test
 .env.production
 

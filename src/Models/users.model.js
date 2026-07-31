@@ -1,4 +1,6 @@
 
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import mongoose , {Schema} from "mongoose";
 const UserSchema= new Schema({
 
@@ -54,4 +56,15 @@ refreshTokens:{
 {
     timestamps:true
 })
+//password encryption before saving .
+UserSchema.pre( "save",async function (next){
+    if(!this.isModified("password")) return next();
+
+    this.password = bcrypt.hash(this.password , 8)
+    next()// as we are dealing with middleware so using next to move on next middleware
+})
+//custom method for checking password is correct or not
+UserSchema.methods.isPasswordCorrect = async function (passward){
+return await    bcrypt.compare(password,this.password)//return value is boolean , compares user string to encrypted string
+}
 export const User = mongoose.model("User", UserSchema)
