@@ -12,7 +12,7 @@ app.use(cookieParser());
 app.use(express.json({
     limit: "130kb"
 }));
-app.use(exprss.urlencoded({
+app.use(express.urlencoded({
 
     extended: true,
     limit: "130kb"
@@ -21,8 +21,8 @@ app.use(cookieParser());
 app.use(express.static("public"));
 
 //routes import
-import userRouter from "../routes/user.routes.js";
-//user router to h he ne in the file so how can we immport that??
+import userRouter from "./routes/user.routes.js";
+//we can give name according to us (userRouter) only when export is default
 //route declaration
 
 app.use("/api/v2/user",userRouter)
