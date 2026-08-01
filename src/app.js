@@ -19,4 +19,15 @@ app.use(exprss.urlencoded({
 }));
 app.use(cookieParser());
 app.use(express.static("public"));
+
+//routes import
+import userRouter from "../routes/user.routes.js";
+//user router to h he ne in the file so how can we immport that??
+//route declaration
+
+app.use("/api/v2/user",userRouter)
+
 export default app;
+
+
+

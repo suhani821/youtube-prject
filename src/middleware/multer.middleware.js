@@ -9,4 +9,4 @@ const storage = multer.diskStorage({
         cb(null,file.originalname)
     }
 })
-export const upload =multer({storage,})k
+export const upload =multer({storage,})
