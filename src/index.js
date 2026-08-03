@@ -1,4 +1,3 @@
-console.log("INDEX FILE STARTED");
 
 import dotenv from "dotenv";
 import Constdb from "./db/index.js";

@@ -6,7 +6,7 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 })
-const cloudanaryFileUpoad = async (localpathurl) => {
+const cloudanaryFileUpload = async (localpathurl) => {
 
     try {
         if (!localpathurl) return null;
@@ -23,4 +23,4 @@ const cloudanaryFileUpoad = async (localpathurl) => {
     }
 
 }
-export {cloudanaryFileUpoad}
+export {cloudanaryFileUpload}

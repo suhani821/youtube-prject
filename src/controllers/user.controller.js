@@ -1,6 +1,6 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { User } from "../Models/users.models.js"
-import { cloudanaryFileUpoad } from "../utils/cloudinary.uploadfilehangling.js"
+import { User } from "../Models/users.model.js"
+import { cloudanaryFileUpload } from "../utils/cloudinary.uploadedfilehandling.js"
 import asyncHandler from "../utils/asynchandler.js";
 import ApiError from "../utils/apierror.js";
 import { useSyncExternalStore } from "react";
