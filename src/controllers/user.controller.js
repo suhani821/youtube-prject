@@ -26,7 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
     //data coming from form or json ( comes inside req.body)
 
 
-    const { username, email, password } = req.body;
+    const {fullname, username, email, password } = req.body;
     console.log(username, "/n", email)
     //validate data send by user
     //  if (fullname===""||name===""||password===""|| email===""){
@@ -34,15 +34,15 @@ const registerUser = asyncHandler(async (req, res) => {
 
     //  } 
 
-    if ([fullname, email, password, username].some((field) => {
-        field.trim() === ""
-    })) {
+    if ([ fullname , email, password, username].some((field) => 
+        field?.trim() === ""
+    )) {
         throw new ApiError("all fields are required", 400)
     }
 
     //to check if user is already registered(registed in database)
-    const existed_user = User.findOne({//findone sabse phela username ya email nikal ker dedega
-        $or: [username, email]
+    const existed_user = await User.findOne({//findone sabse phela username ya email nikal ker dedega
+        $or: [{username}, {email}]
     })
     if (existed_user) {
         throw new ApiError("user already existed , kindly login", 408)
@@ -56,13 +56,13 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     //upload on cloudinary
-    const avatar = await cloudanaryFileUpoad(avatar_localpath)
-    const coverimage = await cloudanaryFileUpoad(coverimage_localpath)
+    const avatar = await cloudanaryFileUpload(avatar_localpath)
+    const coverimage = await cloudanaryFileUpload(coverimage_localpath)
     if (!avatar) {
-        throw new ApiError("upload again", 403)
+        throw new ApiError("upload avatar again", 403)
     }
     if (!coverimage) {
-        throw new ApiError("upload again", 403)
+        throw new ApiError("upload coverimage again", 403)
     }
 
     //to create db entry

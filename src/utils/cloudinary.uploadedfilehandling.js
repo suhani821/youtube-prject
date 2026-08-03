@@ -1,7 +1,7 @@
 import { v2 as fileupload } from "cloudinary";//renaming v2 as fileupload
 import fs from "fs"//manages file and file systems 
 import { syncBuiltinESMExports } from "module";
-cloudinary.config({
+fileupload.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
@@ -10,7 +10,7 @@ const cloudanaryFileUpload = async (localpathurl) => {
 
     try {
         if (!localpathurl) return null;
-        const response = await cloudinary.uploader.upload(localpathurl, {//response will be in url form 
+        const response = await fileupload.uploader.upload(localpathurl, {//response will be in url form 
             resource_type: "auto"
         })
         //file uploaded successfully
