@@ -60,7 +60,7 @@ refreshTokens:{
 UserSchema.pre( "save",async function (next){
     if(!this.isModified("password")) return next();
 
-    this.password = bcrypt.hash(this.password , 8)
+    this.password = await bcrypt.hash(this.password , 8)
     next()// as we are dealing with middleware so using next to move on next middleware
 })
 //custom method for checking password is correct or not
@@ -89,4 +89,4 @@ process.env.REFRESH_TOKEN_SECRET,
     expiresIn:  process.env.REFRESH_TOKEN_EXPIRY
 })}
 
-export const User = mongoose.model("User", UserSchema)
+export  const User = mongoose.model("User", UserSchema)
