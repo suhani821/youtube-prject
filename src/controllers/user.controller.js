@@ -4,6 +4,19 @@ import { cloudanaryFileUpload } from "../utils/cloudinary.uploadedfilehandling.j
 import asyncHandler from "../utils/asynchandler.js";
 import ApiError from "../utils/apierror.js";
 import { useSyncExternalStore } from "react";
+const generatngAccessAndRefreshTokens = async(userId)=>{
+try {
+    
+    const user= await User.findById(userId)
+    const refreshToken =user.generateRefreshTokens();
+    const accessToken = user.generateAccessTokens();
+    user.refreshTokens =refreshToken;
+    await user.save({validateBeforeSave:false})//as if it is true then it will also check password field
+    return {accessToken, refreshToken}
+} catch (error) {
+    throw new ApiError("something went wrong in generating refresh or access token",501);
+}
+}
 const registerUser = asyncHandler(async (req, res) => {
     // res.status(200).json({ message:"ok"
 
@@ -92,5 +105,54 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 })
 
+const loginUser =asyncHandler(async (req,res)=>{
+    //req body-> data
+    //if fields are empty return all fields are required
+    //if user doesnot exist -  do register
+    //if username , email , passsword is correct 
+    //sending access and refresh tokens
+    //send cookies
+    //login successfully
 
-export { registerUser };
+
+
+
+    //data from body
+    const {username,email,password}=req.body
+    if(!username||!email){
+        throw new ApiError("enter username or email",406);
+
+    }
+    //to find user based on email or username
+    const registeredUser= await User.findOne({
+        $or: [{username},{email}]
+    })//either to find using email or using username
+
+//if user doesnot exists
+    if(!registerUser){
+        throw new ApiError("user is not registered", 423)
+    }
+    //is password correct
+    const isCorrect = await user.isPasswordCorrect(password)//user is for using function made inside user function inside user.model.js where as User is for accessing function from mongooese liberary
+if (!isCorrect) {
+throw new ApiError("password is not correct ", 411);
+    
+}
+
+  const {accessToken,refreshToken} =await generatngAccessAndRefreshTokens(registeredUser._id)
+const loggedinUser=await User.findById(registerUser._id).select("-password -refreshTokens")
+ //sending cookies securly
+ const option={
+    secure:true,//visible in frontend but can be modified by server only , 
+    httpOnly:true
+}
+ return res.status(200).cookie("accessToken", accessToken ,option)// accessToken value... (ensure security)
+ .cookie("refreshToken", refreshToken, option).json( new ApiResponse(200, {user: loggedinUser,accessToken,refreshToken},"user logged in successfully"))
+
+})
+
+
+const logOutUser=asyncHandler(async(req,res)=>{
+    
+})
+export { registerUser ,loginUser };
