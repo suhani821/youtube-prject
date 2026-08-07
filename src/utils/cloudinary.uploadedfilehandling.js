@@ -2,7 +2,7 @@ import { v2 as fileupload } from "cloudinary";//renaming v2 as fileupload
 import fs from "fs"//manages file and file systems 
 import { syncBuiltinESMExports } from "module";
 fileupload.config({
-    cloud_name: process.env.CLOUD_NAME,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 })
@@ -15,6 +15,7 @@ const cloudanaryFileUpload = async (localpathurl) => {
         })
         //file uploaded successfully
         console.log("successfull upload", response.url)
+        fs.unlinkSync(localpathurl)
         return response;
     } catch (error) {
         

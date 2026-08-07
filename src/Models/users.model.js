@@ -61,10 +61,10 @@ UserSchema.pre( "save",async function (next){
     if(!this.isModified("password")) return next();
 
     this.password = await bcrypt.hash(this.password , 8)
-    next()// as we are dealing with middleware so using next to move on next middleware
+   // next() as we are dealing with middleware so using next to move on next middleware
 })
 //custom method for checking password is correct or not
-UserSchema.methods.isPasswordCorrect = async function (passward){
+UserSchema.methods.isPasswordCorrect = async function (password){
 return await    bcrypt.compare(password,this.password)//return value is boolean , compares user string to encrypted string
 }
 UserSchema.methods.generateAccessTokens=function (){

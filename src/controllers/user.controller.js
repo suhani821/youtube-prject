@@ -60,6 +60,9 @@ const registerUser = asyncHandler(async (req, res) => {
     const coverimage = await cloudanaryFileUpload(coverimage_localpath)
     if (!avatar) {
         throw new ApiError("upload avatar again", 403)
+        
+        
+
     }
     if (!coverimage) {
         throw new ApiError("upload coverimage again", 403)
