@@ -153,6 +153,18 @@ const loggedinUser=await User.findById(registerUser._id).select("-password -refr
 
 
 const logOutUser=asyncHandler(async(req,res)=>{
-    
-})
-export { registerUser ,loginUser };
+    await User.findByIdAndUpdate(req.user._id),{
+        set: {
+            refreshTokens:undefined
+        }
+    },{
+            new:true
+        }
+         const option={
+    secure:true,//visible in frontend but can be modified by server only , 
+    httpOnly:true
+}
+return res.status(200).clearCookie("access Token",option).clearCookie("refreshToken", option).json (new ApiResponse(200, {},"successfully logout "))
+}
+)
+export { registerUser ,loginUser ,logOutUser};

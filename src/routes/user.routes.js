@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {upload} from "../middleware/multer.middleware.js"
-import {registerUser} from "../controllers/user.controller.js"
+import {registerUser ,loginUser ,logOutUser} from "../controllers/user.controller.js"
+import {verifyjwt } from "../middleware/auth.middleware.js"
 const router = Router();
 router.route("/register").post(  
     //middleware inject just before the method used ,,, (jo kerna h kero bas usse phele mujse milke jaoo: middleware work)
@@ -12,6 +13,7 @@ router.route("/register").post(
         maxCount: 1,
     }])
     ,registerUser);
-
+router.route("/login").post(loginUser)
+router.route("/logout").post(verifyjwt,logOutUser)
 
 export default router ;
