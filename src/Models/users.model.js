@@ -57,8 +57,8 @@ refreshTokens:{
     timestamps:true
 })
 //password encryption before saving .
-UserSchema.pre( "save",async function (next){
-    if(!this.isModified("password")) return next();
+UserSchema.pre( "save",async function (){
+    if(!this.isModified("password")) return ;
 
     this.password = await bcrypt.hash(this.password , 8)
    // next() as we are dealing with middleware so using next to move on next middleware

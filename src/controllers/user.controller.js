@@ -1,22 +1,39 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { User } from "../Models/users.model.js"
+import { User  } from "../Models/users.model.js"
 import { cloudanaryFileUpload } from "../utils/cloudinary.uploadedfilehandling.js"
 import asyncHandler from "../utils/asynchandler.js";
 import ApiError from "../utils/apierror.js";
-import { useSyncExternalStore } from "react";
-const generatngAccessAndRefreshTokens = async(userId)=>{
-try {
-    
-    const user= await User.findById(userId)
-    const refreshToken =user.generateRefreshTokens();
-    const accessToken = user.generateAccessTokens();
-    user.refreshTokens =refreshToken;
-    await user.save({validateBeforeSave:false})//as if it is true then it will also check password field
-    return {accessToken, refreshToken}
-} catch (error) {
-    throw new ApiError("something went wrong in generating refresh or access token",501);
-}
-}
+import mongoose from "mongoose";
+
+const generatngAccessAndRefreshTokens = async (userId) => {
+    try {
+        const user = await User.findById(userId);
+
+        console.log("USER FOUND:", !!user);
+
+        const refreshToken = user.generateRefreshTokens();
+        console.log("REFRESH TOKEN GENERATED");
+
+        const accessToken = user.generateAccessTokens();
+        console.log("ACCESS TOKEN GENERATED");
+
+        user.refreshTokens = refreshToken;
+
+        await user.save({ validateBeforeSave: false });
+
+        return { accessToken, refreshToken };
+
+    } catch (error) {
+        console.error("========== TOKEN ERROR ==========");
+        console.error(error);
+        console.error("================================");
+
+        throw new ApiError(
+            "Something went wrong in generating refresh or access token", 500
+           
+        );
+    }
+};
 const registerUser = asyncHandler(async (req, res) => {
     // res.status(200).json({ message:"ok"
 
@@ -119,7 +136,7 @@ const loginUser =asyncHandler(async (req,res)=>{
 
     //data from body
     const {username,email,password}=req.body
-    if(!username||!email){
+    if(!username&&!email){
         throw new ApiError("enter username or email",406);
 
     }
@@ -129,18 +146,18 @@ const loginUser =asyncHandler(async (req,res)=>{
     })//either to find using email or using username
 
 //if user doesnot exists
-    if(!registerUser){
+    if(!registeredUser){
         throw new ApiError("user is not registered", 423)
     }
     //is password correct
-    const isCorrect = await user.isPasswordCorrect(password)//user is for using function made inside user function inside user.model.js where as User is for accessing function from mongooese liberary
+    const isCorrect = await registeredUser.isPasswordCorrect(password)//user is for using function made inside user function inside user.model.js where as User is for accessing function from mongooese liberary
 if (!isCorrect) {
 throw new ApiError("password is not correct ", 411);
     
 }
 
   const {accessToken,refreshToken} =await generatngAccessAndRefreshTokens(registeredUser._id)
-const loggedinUser=await User.findById(registerUser._id).select("-password -refreshTokens")
+const loggedinUser=await User.findById(registeredUser._id).select("-password -refreshTokens ")
  //sending cookies securly
  const option={
     secure:true,//visible in frontend but can be modified by server only , 
@@ -154,7 +171,7 @@ const loggedinUser=await User.findById(registerUser._id).select("-password -refr
 
 const logOutUser=asyncHandler(async(req,res)=>{
     await User.findByIdAndUpdate(req.user._id),{
-        set: {
+        $set: {
             refreshTokens:undefined
         }
     },{
@@ -164,7 +181,7 @@ const logOutUser=asyncHandler(async(req,res)=>{
     secure:true,//visible in frontend but can be modified by server only , 
     httpOnly:true
 }
-return res.status(200).clearCookie("access Token",option).clearCookie("refreshToken", option).json (new ApiResponse(200, {},"successfully logout "))
+return res.status(200).clearCookie("accessToken",option).clearCookie("refreshToken", option).json (new ApiResponse(200, {},"successfully logout "))
 }
 )
 export { registerUser ,loginUser ,logOutUser};
