@@ -4,7 +4,7 @@ import { cloudanaryFileUpload } from "../utils/cloudinary.uploadedfilehandling.j
 import asyncHandler from "../utils/asynchandler.js";
 import ApiError from "../utils/apierror.js";
 import mongoose from "mongoose";
-
+import jwt from "jsonwebtoken"
 const generatngAccessAndRefreshTokens = async (userId) => {
     try {
         const user = await User.findById(userId);
@@ -184,4 +184,35 @@ const logOutUser=asyncHandler(async(req,res)=>{
 return res.status(200).clearCookie("accessToken",option).clearCookie("refreshToken", option).json (new ApiResponse(200, {},"successfully logout "))
 }
 )
-export { registerUser ,loginUser ,logOutUser};
+
+const refreshAccessToken= asyncHandler(async(req,res)=>{
+    const incomingRefreshToken = req.cookie.refreshToken
+    if(!incomingRefreshToken){
+        throw new ApiError("unable to access refresh tokens" , 406)
+    }
+ try {
+    const decodedToken=jwt.verify(refreshAccessToken,process.env.REFRESH_TOKEN_SECRET)
+    const user = await User.findById(decodedToken?._id)
+    if(!user){
+       throw new ApiError("user not found",406)
+   
+    }
+    if (incomingRefreshToken!==user?.refreshTokens) {
+       throw new ApiError("invalid refresh token",422)
+    }
+    const options = {//options are used whenever we want to send data  in cookies in users device
+       httpOnly:true,
+       secure:true
+    }
+    const {accessToken,newrefreshToken}=await generatngAccessAndRefreshTokens(user._id)
+     return res.status(200).cookie("accessToken" ,accessToken ,options )
+   .cookie("refreshToken", newrefreshToken ,options )
+   .json(ApiResponse(200,{accessToken,refreshToken: newrefreshToken}, "access token refresh successfully"))
+   
+ } catch (error) {
+    console.error("error in refreshing refresh token", error)
+    throw new ApiError(error?.message || "not refreshed ",405)
+ }
+}
+)
+export { registerUser ,loginUser ,logOutUser ,refreshAccessToken};
