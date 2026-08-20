@@ -167,7 +167,9 @@ const loggedinUser=await User.findById(registeredUser._id).select("-password -re
  .cookie("refreshToken", refreshToken, option).json( new ApiResponse(200, {user: loggedinUser,accessToken,refreshToken},"user logged in successfully"))
 
 })
-
+const getCurrentUser = asyncHandler(async(req,res)=>{
+return res.status(200).json( new ApiResponse (200 ,req.user,"current user fetch successfully"))
+})
 
 const logOutUser=asyncHandler(async(req,res)=>{
     await User.findByIdAndUpdate(req.user._id),{
@@ -215,4 +217,80 @@ const refreshAccessToken= asyncHandler(async(req,res)=>{
  }
 }
 )
-export { registerUser ,loginUser ,logOutUser ,refreshAccessToken};
+const createNewPassword = asyncHandler(async(req,res)=>{
+const {oldPassword , newPassword} = req.body
+const user =  await User.findById(req.user?._id)
+ const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+ if (!isPasswordCorrect) {
+    throw new ApiError("password is incorrect , enter correct password ",233)
+ }
+ user.password = newPassword;
+  await user.password.save({validateBeforeSave:false})
+  return res.status(200).json(new ApiResponse(200,{},"new password created successfully"))
+})
+
+
+const updateUserDetails = asyncHandler(async(req,res)=>{
+const { fullname , email}= req.body
+if (!email||!fullname) {
+    throw new ApiError("enter name or email to change",400)
+}
+  const updatedUser= await User.findByIdAndUpdate(req.user._id , {
+$set:{
+    email,//email = email
+    fullname //fullname= fullname
+}
+},
+{new:true})//this helps to return updated information 
+.select("-password")
+return res.status(200).
+json(new ApiResponse(200, updatedUser,"user is updated"))
+})
+
+
+const updateUserAvatar = asyncHandler(async(req,res)=>{
+const avatar = req.body
+const avatar_localpath = req.file?.path
+if (!avatar_localpath) {
+    throw new apierror("file does not exitst", 402)
+    
+} 
+  const cloundinaryAvatarPath= await cloudanaryFileUpload(avatar_localpath)
+  if (!cloundinaryAvatarPath.url) {
+    throw new apierror("file is not uploaded to cloudinary",400)
+  }
+  const user = await User.findByIdAndUpdate(req.user._id,{
+    $set: {avatar:avatar_localpath.url  }
+},{new:true}).select("-password")
+return res.status(200).json(new ApiResponse(200,user,"userAvatar changed successfully"))
+})
+
+const updateCoverImage = asyncHandler(async(req,res)=>{
+    const coverimage = req.body
+    const coverimage_url = req.file?.path
+    if(!coverimage_url){
+        throw new apierror("coverimage not uploaded",444)
+
+    }
+    const cloudanary_coverimage=await cloudanaryFileUpload(coverimage_url)
+    if(!cloudanary_coverimage.url){
+        throw new apierror("coverimage not uploaded on cloudanary", 400)
+    }
+    const user = await User.findByIdAndUpdate(req.user._id,{
+        $set:{
+            coverimage:cloudanary_coverimage.url 
+        }
+    },{new:true}).select("-password")
+return res.status(200).json(new ApiResponse(200,user,"coverimage changed successfully"))
+
+})
+export { registerUser ,
+    loginUser ,
+    logOutUser ,
+    refreshAccessToken ,
+    createNewPassword ,
+    getCurrentUser ,
+    updateUserDetails,
+updateUserAvatar,
+updateCoverImage
+};
