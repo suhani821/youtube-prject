@@ -381,8 +381,10 @@ const user = await User.aggregate([
         }
     }
 
+]
+)
 return res.status(200).json(new ApiResponse(200,user[0].watchHistory,"all watched videoes are fetched successfully"))
-])
+
 
  })
 
